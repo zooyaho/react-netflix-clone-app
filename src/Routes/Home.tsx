@@ -1,6 +1,6 @@
 const Home = () => {
   return (
-    <div style={{backgroundColor:"black", height:"200vh" }}></div>
+    <div style={{backgroundColor: "${props=>props.theme.white.lighter}", height:"200vh" }}></div>
   );
 };
 
