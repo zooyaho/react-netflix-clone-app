@@ -1,6 +1,6 @@
 const Home = () => {
   return (
-    null
+    <div style={{backgroundColor:"black", height:"200vh" }}></div>
   );
 };
 
