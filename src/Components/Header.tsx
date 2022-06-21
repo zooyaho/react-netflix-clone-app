@@ -1,5 +1,6 @@
+import {useState} from 'react';
 import styled from "styled-components";
-import {motion} from 'framer-motion';
+import { motion, useAnimation, useViewportScroll } from 'framer-motion';
 import {Link, useMatch} from "react-router-dom";
 
 const Nav = styled.nav`
@@ -38,7 +39,6 @@ const Items = styled.ul`
 const Item = styled.li`
   margin-right: 20px;
   color: ${(props) => props.theme.white.lighter};
-  // font-weight: 400;
   transition: font-weight,color 0.3s ease-in-out;
   margin-right: 20px;
   cursor: pointer;
@@ -49,8 +49,28 @@ const Item = styled.li`
 
 const Search = styled.span`
   color: white;
+  display: flex;
+  align-items: center;
+  position: relative;
   svg {
     height: 25px;
+  }
+`;
+
+const SearchInput = styled(motion.input)`
+  background-color: ${props=> props.theme.black.lighter};
+  border: 1px solid ${props=> props.theme.white.darker};
+  position: absolute;
+  right:0px;
+  height: 40px;
+  width: 250px;
+  padding-left: 40px;
+  transform-origin: right center; // 변화가 시작하는 위치를 의미함. 
+  color: ${props=> props.theme.white.lighter};
+  font-size: 16px;
+  z-index: -1;
+  &:focus {
+    outline: none;
   }
 `;
 
@@ -70,14 +90,24 @@ const logoVariants = {
 }
 
 const Header = () => {
+  const [toggleSearch, setToggleSearch] = useState(false);
   const homeMatch = useMatch("/");
   const tvMatch = useMatch("tv");
-  console.log(homeMatch , tvMatch);
+  const inputAnimation = useAnimation(); // animation들을 동시에 실행시킬 때 유용함.
+
+  const toggleSearchHandler = ()=>{
+    if(toggleSearch){
+      inputAnimation.start({ scaleX: 0 });
+    } else {
+      inputAnimation.start({ scaleX: 1 });
+    }
+    setToggleSearch(prev=> !prev)
+  };
 
   return (
     <Nav>
       <Col>
-      <Logo
+        <Logo
           xmlns="http://www.w3.org/2000/svg"
           width="1024"
           height="276.742"
@@ -91,22 +121,19 @@ const Header = () => {
         </Logo>
         <Items>
           <Item>
-            {
-              homeMatch ? 
-              <Link style={{fontWeight:"400"}} to="/">Home</Link> : <Link to="/">Home</Link>
-            }
+            <Link style={{fontWeight: homeMatch ? "400" : ""}} to="/">Home</Link> 
           </Item>
           <Item>
-            {
-              tvMatch ? 
-              <Link style={{fontWeight:"400"}} to="tv"> Tv Shows</Link> : <Link to="tv">Tv Shows</Link>
-            }
+            <Link style={{fontWeight: tvMatch ? "400" : ""}} to="tv"> Tv Shows</Link>
           </Item>
         </Items>
       </Col>
       <Col>
         <Search>
-          <svg
+          <motion.svg
+            onClick={toggleSearchHandler}
+            animate={{x: toggleSearch ? "-218px" : "0px"}}
+            transition={{type:"linear"}} // 선형적으로 animation지정
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
@@ -116,7 +143,14 @@ const Header = () => {
               d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
               clipRule="evenodd"
             ></path>
-          </svg>
+          </motion.svg>
+          <SearchInput 
+            animate={inputAnimation}
+            // animate={{scaleX: toggleSearch ? 1 : 0}}
+            initial={{ scaleX: 0 }}
+            transition={{type:"linear"}} // 선형적으로 animation지정
+            placeholder="Search for movie or tv show..."
+          />
         </Search>
       </Col>
     </Nav>
