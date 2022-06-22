@@ -53,11 +53,13 @@ const Row = styled(motion.div)`
   width: 100%;
 `;
 
-const Box = styled(motion.div)`
-  background-color: white;
+const Box = styled(motion.div)<{bgPhoto:string}>`
+  background-image: url(${props=>props.bgPhoto});
+  background-size: cover;
+  background-position: center center; // 상하좌우 center
+  // background-color: white;
   height: 200px;
   color: red;
-  font-size: 66px;
 `;
 
 const offset = 6; // 슬라이드에서 한번에 보여줄 영화의 개수를 6으로 설정
@@ -72,14 +74,16 @@ const Home = () => {
 
   // sliser index 번호 증가 함수
   const increaseindexHandler = ()=>{
-    if(isLeaving) return;
-    toggleLeaving(); // 1. 다음 Row로 바뀌기 전에 isLeavig의 상태를 true로 바꿈.
-    
-    // 영화가 총 몇개인지 확인. 페이지가 상한에 도달했을때 0으로 리셋해줘야 함.
-    const totalMovies = data?.results.length;
-    console.log(totalMovies);
+    if(data){ // data가 있을 경우에만 적용
 
-    setSliderIndex(prev=> prev + 1);
+      if(isLeaving) return;
+      toggleLeaving(); // 1. 다음 Row로 바뀌기 전에 isLeavig의 상태를 true로 바꿈.
+      
+      // 영화가 총 몇개인지 확인. 페이지가 상한에 도달했을때 0으로 리셋해줘야 함.
+      const totalMovies = data.results.length - 1; 
+      const maxIndex = Math.floor(totalMovies / offset) - 1; // SliderIndex가 0부터 시작하므로 maxIndex는 2로 예상
+      setSliderIndex(prev=> prev === maxIndex ? 0 : prev + 1);
+    }
   }
   const decreaseindexHandler = ()=>{
     toggleLeaving();
@@ -133,7 +137,8 @@ const Home = () => {
                   .map((movie:IMovie) => (
                     <Box 
                       key={movie.id}
-                    >{movie.title}</Box>
+                      bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
+                    />
                   ))}
               </Row>
             </AnimatePresence>
