@@ -1,9 +1,9 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import styled from "styled-components";
 import { motion, useAnimation, useViewportScroll } from 'framer-motion';
 import {Link, useMatch} from "react-router-dom";
 
-const Nav = styled.nav`
+const Nav = styled(motion.nav)`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -94,6 +94,8 @@ const Header = () => {
   const homeMatch = useMatch("/");
   const tvMatch = useMatch("tv");
   const inputAnimation = useAnimation(); // animation들을 동시에 실행시킬 때 유용함.
+  const navAnimation = useAnimation();
+  const {scrollY} = useViewportScroll(); // 스크롤을 움직일 때 제일 밑에서 얼마나 멀리 있는지 알려줌.
 
   const toggleSearchHandler = ()=>{
     if(toggleSearch){
@@ -104,8 +106,21 @@ const Header = () => {
     setToggleSearch(prev=> !prev)
   };
 
+  useEffect(()=>{
+    scrollY.onChange(()=>{
+      console.log(scrollY.get());
+      if(scrollY.get() > 80){
+        navAnimation.start({backgroundColor: "rgba(0,0,0,1)"});
+      } else {
+        navAnimation.start({backgroundColor: "rgba(0,0,0,0)"});
+      }
+    })
+  },[scrollY]);
+
   return (
-    <Nav>
+    <Nav 
+      animate={navAnimation}
+    >
       <Col>
         <Logo
           xmlns="http://www.w3.org/2000/svg"
@@ -145,9 +160,9 @@ const Header = () => {
             ></path>
           </motion.svg>
           <SearchInput 
+            initial={{ scaleX: 0 }}
             animate={inputAnimation}
             // animate={{scaleX: toggleSearch ? 1 : 0}}
-            initial={{ scaleX: 0 }}
             transition={{type:"linear"}} // 선형적으로 animation지정
             placeholder="Search for movie or tv show..."
           />
