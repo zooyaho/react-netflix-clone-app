@@ -60,9 +60,9 @@ const GlobalStyle = createGlobalStyle`
   }
   body {
     font-weight: 300;
-    color:black;
+    color: white;
     line-height: 1.2;
-    
+    background: black;
   }
   a {
     text-decoration:none;
