@@ -97,6 +97,7 @@ const Header = () => {
   const navAnimation = useAnimation();
   const {scrollY} = useViewportScroll(); // 스크롤을 움직일 때 제일 밑에서 얼마나 멀리 있는지 알려줌.
 
+  // 검색 토글 버튼 핸들러
   const toggleSearchHandler = ()=>{
     if(toggleSearch){
       inputAnimation.start({ scaleX: 0 });
@@ -107,6 +108,7 @@ const Header = () => {
   };
 
   useEffect(()=>{
+    // 스크롤 시 header배경색 변경
     scrollY.onChange(()=>{
       console.log(scrollY.get());
       if(scrollY.get() > 80){
