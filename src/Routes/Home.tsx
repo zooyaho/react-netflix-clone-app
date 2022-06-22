@@ -63,15 +63,19 @@ const Box = styled(motion.div)`
 const Home = () => {
   const {data, isLoading} = useQuery(['movies', 'nowPlaying'], getMovies);
   const [sliderIndex, setSliderIndex] = useState(0);
-  const [back, setBack] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false); // 원래 있던 Row가 사라지기도 전에 새 Row도 사라지는 걸 방지하는 변수.
+
+  // isLeaving의 상태를 2번 바꿔 버그를 방지함.
+  const toggleLeavig = ()=>{setIsLeaving(prev=> !prev)}
 
   // sliser index 번호 증가 함수
   const increaseindexHandler = ()=>{
-    setBack(true);
+    if(isLeaving) return;
+    toggleLeavig(); // 1. 다음 Row로 바뀌기 전에 isLeavig의 상태를 true로 바꿈.
     setSliderIndex(prev=> prev + 1);
   }
   const decreaseindexHandler = ()=>{
-    setBack(false);
+    toggleLeavig();
     setSliderIndex(prev=> prev - 1);
   }
 
@@ -102,9 +106,10 @@ const Home = () => {
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
           <Slider>
-            <AnimatePresence>
+            {/* // 2. onExitComplete: exit가 끝날 때 실행되므로 isLeaving상태를 flase로 바꿈 */}
+            <AnimatePresence onExitComplete={toggleLeavig}>
               <Row 
-                // custom={back}
+                // custom={setLeaving}
                 key={sliderIndex} // key가 변경 되면 새로운 row를 생성함!
                 variants={rowVariants}
                 initial="hidden"
