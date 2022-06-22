@@ -1,6 +1,8 @@
+import React, {useState} from 'react';
 import {useQuery} from 'react-query';
 import {getMovies} from '../api';
 import styled from 'styled-components';
+import {motion, AnimatePresence} from 'framer-motion';
 import {makeImagePath} from '../utils';
 
 const Wrapper = styled.div`
@@ -37,9 +39,54 @@ const Overview = styled.p`
   width: 50%;
 `;
 
+const Slider = styled.div`
+  position: relative;
+  top: -100px;
+`;
+
+// 6개의 Box컴포넌트를 감쌈.
+const Row = styled(motion.div)`
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(6, 1fr);
+  position: absolute;
+  width: 100%;
+`;
+
+const Box = styled(motion.div)`
+  background-color: white;
+  height: 200px;
+  color: red;
+  font-size: 66px;
+`;
+
 const Home = () => {
   const {data, isLoading} = useQuery(['movies', 'nowPlaying'], getMovies);
-  console.log(data, isLoading);
+  const [sliderIndex, setSliderIndex] = useState(0);
+  const [back, setBack] = useState(false);
+
+  // sliser index 번호 증가 함수
+  const increaseindexHandler = ()=>{
+    setBack(true);
+    setSliderIndex(prev=> prev + 1);
+  }
+  const decreaseindexHandler = ()=>{
+    setBack(false);
+    setSliderIndex(prev=> prev - 1);
+  }
+
+  const rowVariants = {
+    hidden: {
+      x: window.outerWidth + 5, // 사용자의 화면 크기를 가져와야 자연스럽게 슬라이드 되며 Row와 Row 사이의 gap을 주기위해 +5을 적용.
+    },
+    visible: {
+      x: 0,
+    },
+    exit: {
+      x: -window.outerWidth - 5,
+    },
+  }
+
 
   return (
     <Wrapper>{isLoading ? (
@@ -47,12 +94,28 @@ const Home = () => {
       ) : (
         <>
           <Banner 
+            onClick={increaseindexHandler}
             // image path에 대한 fallback(〔컴퓨터〕 （고장시의） 대체 시스템) 설정
             bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}
           >
             <Title>{data?.results[0].title}</Title>
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
+          <Slider>
+            <AnimatePresence>
+              <Row 
+                // custom={back}
+                key={sliderIndex} // key가 변경 되면 새로운 row를 생성함!
+                variants={rowVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{type:"tween", duration: 1}}
+              >
+                {[1,2,3,4,5,6].map(i=> <Box key={i}>{i}</Box>)}
+              </Row>
+            </AnimatePresence>
+          </Slider>
         </>
       )}
     </Wrapper>
