@@ -110,7 +110,6 @@ const Header = () => {
   useEffect(()=>{
     // 스크롤 시 header배경색 변경
     scrollY.onChange(()=>{
-      console.log(scrollY.get());
       if(scrollY.get() > 80){
         navAnimation.start({backgroundColor: "rgba(0,0,0,1)"});
       } else {
