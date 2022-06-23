@@ -41,7 +41,7 @@ const Overview = styled.p`
 
 const Slider = styled.div`
   position: relative;
-  top: -100px;
+  top: -150px;
 `;
 
 // 6개의 Box컴포넌트를 감쌈.
@@ -60,6 +60,12 @@ const Box = styled(motion.div)<{bgPhoto:string}>`
   // background-color: white;
   height: 200px;
   color: red;
+  &: first-child {
+    transform-origin: center left;
+  }
+  &: last-child {
+    transform-origin: center right;
+  }
 `;
 
 const offset = 6; // 슬라이드에서 한번에 보여줄 영화의 개수를 6으로 설정
@@ -102,6 +108,21 @@ const Home = () => {
     },
   }
 
+  const boxVariants = {
+    normal: {
+      scale: 1,
+    },
+    hover: {
+      scale: 1.3,
+      y: -50,
+      transition : {
+        delay: .5, // 특정해서 delay를 줌. blur시 delay 적용 안됨.
+        duration: 0.3,
+        type: "tween",
+      }
+    }
+  }
+
   return (
     <Wrapper>{isLoading ? (
       <Loader>Loading...</Loader>
@@ -136,6 +157,10 @@ const Home = () => {
                   .slice(offset * sliderIndex, offset * sliderIndex + offset)
                   .map((movie:IMovie) => (
                     <Box 
+                      variants={boxVariants}
+                      initial="normal"
+                      whileHover="hover"
+                      transition={{type: "tween"}} // 둘다 설정해야 blur시에도 spring효과가 사라짐.
                       key={movie.id}
                       bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
                     />
