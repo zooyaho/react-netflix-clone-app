@@ -53,19 +53,28 @@ const Row = styled(motion.div)`
   width: 100%;
 `;
 
-const Box = styled(motion.div)<{bgPhoto:string}>`
+const SlideBox = styled(motion.div)<{bgPhoto:string}>`
   background-image: url(${props=>props.bgPhoto});
   background-size: cover;
   background-position: center center; // 상하좌우 center
   // background-color: white;
   height: 200px;
-  color: red;
+  color: ${props=> props.theme.white.lighter};
   &: first-child {
     transform-origin: center left;
   }
   &: last-child {
     transform-origin: center right;
   }
+`;
+
+const SlideInfo = styled(motion.div)`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  opacity: 0;
+  padding: 10px;
+  background-color: ${props=> props.theme.black.lighter};
 `;
 
 const offset = 6; // 슬라이드에서 한번에 보여줄 영화의 개수를 6으로 설정
@@ -122,6 +131,16 @@ const Home = () => {
       }
     }
   }
+  const infoVariants = {
+    hover: {
+      opacity: 1,
+      transition : {
+        delay: .5,
+        duration: 0.3,
+        type: "tween",
+      }
+    },
+  }
 
   return (
     <Wrapper>{isLoading ? (
@@ -156,14 +175,19 @@ const Home = () => {
                   .slice(1)
                   .slice(offset * sliderIndex, offset * sliderIndex + offset)
                   .map((movie:IMovie) => (
-                    <Box 
+                    <SlideBox 
                       variants={boxVariants}
                       initial="normal"
                       whileHover="hover"
                       transition={{type: "tween"}} // 둘다 설정해야 blur시에도 spring효과가 사라짐.
                       key={movie.id}
                       bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
-                    />
+                    >
+                      {/* <img /> */}
+                      <SlideInfo variants={infoVariants} >
+                        <h4>{movie.title}</h4>
+                      </SlideInfo>
+                    </SlideBox>
                   ))}
               </Row>
             </AnimatePresence>
