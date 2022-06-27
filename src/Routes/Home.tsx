@@ -4,6 +4,7 @@ import {getMovies, IMovie} from '../api';
 import styled from 'styled-components';
 import {motion, AnimatePresence} from 'framer-motion';
 import {makeImagePath} from '../utils';
+import {useNavigate, useMatch} from 'react-router-dom';
 
 const Wrapper = styled.div`
   background: black;
@@ -60,6 +61,7 @@ const SlideBox = styled(motion.div)<{bgPhoto:string}>`
   // background-color: white;
   height: 200px;
   color: ${props=> props.theme.white.lighter};
+  cursor: pointer;
   &: first-child {
     transform-origin: center left;
   }
@@ -83,6 +85,9 @@ const Home = () => {
   const {data, isLoading} = useQuery(['movies', 'nowPlaying'], getMovies);
   const [sliderIndex, setSliderIndex] = useState(0); // page수, api에서 총 19개의 영화를 가져오므로 page는 3개임.(0,1,2)
   const [isLeaving, setIsLeaving] = useState(false); // 원래 있던 Row가 사라지기도 전에 새 Row도 사라지는 걸 방지하는 변수. 두번씩 클릭해도 정상적으로 슬라이드 효과를 냄.
+  const navigate = useNavigate();
+  const bigMovieMatch = useMatch("/movies/:movieId");
+  console.log(bigMovieMatch);
 
   // isLeaving의 상태를 2번 바꿔 버그를 방지함.
   const toggleLeaving = ()=>{setIsLeaving(prev=> !prev)}
@@ -103,6 +108,11 @@ const Home = () => {
   const decreaseindexHandler = ()=>{
     toggleLeaving();
     setSliderIndex(prev=> prev - 1);
+  }
+
+  const boxClickedHandler = (movieId:number)=> {
+    // box클릭 시 URL변경
+    navigate(`/movies/${movieId}`);
   }
 
   const rowVariants = {
@@ -180,6 +190,7 @@ const Home = () => {
                       initial="normal"
                       whileHover="hover"
                       transition={{type: "tween"}} // 둘다 설정해야 blur시에도 spring효과가 사라짐.
+                      onClick={()=>{boxClickedHandler(movie.id)}}
                       key={movie.id}
                       bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
                     >

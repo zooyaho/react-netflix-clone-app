@@ -91,7 +91,7 @@ const logoVariants = {
 
 const Header = () => {
   const [toggleSearch, setToggleSearch] = useState(false);
-  const homeMatch = useMatch("/");
+  const homeMatch = useMatch("/"); // path에 따른 메뉴의 폰트굵기 지정
   const tvMatch = useMatch("tv");
   const inputAnimation = useAnimation(); // animation들을 동시에 실행시킬 때 유용함.
   const navAnimation = useAnimation();
