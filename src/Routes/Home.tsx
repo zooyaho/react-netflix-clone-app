@@ -88,6 +88,41 @@ const Overlay = styled(motion.div)`
   opacity: 0;
 `;
 
+const BigMovieModal = styled(motion.div)`
+  position: absolute; 
+  width: 60vw; 
+  height:  80vh;
+  background-Color: pink; 
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+  background-color: ${(props) => props.theme.black.lighter};
+`;
+
+const BigCover = styled.div`
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
+  height: 400px;
+`;
+
+const BigTitle = styled.h3`
+  color: ${(props) => props.theme.white.lighter};
+  padding: 20px;
+  font-size: 46px;
+  position: relative;
+  top: -80px;
+`;
+
+const BigOverview = styled.p`
+  padding: 20px;
+  position: relative;
+  top: -80px;
+  color: ${(props) => props.theme.white.lighter};
+`;
+
 const offset = 6; // 슬라이드에서 한번에 보여줄 영화의 개수를 6으로 설정
 
 const Home = () => {
@@ -119,15 +154,16 @@ const Home = () => {
     setSliderIndex(prev=> prev - 1);
   }
 
-  const boxClickedHandler = (movieId:number)=> {
-    // box클릭 시 URL변경
-    navigate(`/movies/${movieId}`);
-  }
+  // box클릭 시 URL변경
+  const boxClickedHandler = (movieId:number) => navigate(`/movies/${movieId}`);
 
-  const overlayClickedHandler = ()=>{
-    // overlay클릭 시 모듈창 닫힘.
-    navigate(`/`);
-  };
+  // overlay클릭 시 모듈창 닫힘.
+  const overlayClickedHandler = () => navigate(`/`);
+
+  // 슬라이드 박스에서 클릭한 영화의 정보
+  const clickedMovie = 
+    bigMovieMatch?.params.movieId && 
+    data?.results.find( (movie:IMovie) => String(movie.id) === bigMovieMatch.params.movieId );
 
   /* s: Variants */
   const rowVariants = {
@@ -223,19 +259,25 @@ const Home = () => {
             {bigMovieMatch ? (
               <>
                 <Overlay onClick={overlayClickedHandler} animate={{opacity:1}} />
-                <motion.div 
+                <BigMovieModal
                   layoutId={bigMovieMatch.params.movieId + ""}
-                  style={{
-                    position:"absolute", 
-                    width:"40vw", 
-                    height: "80vh",
-                    backgroundColor:"pink", 
-                    top: scrollY.get() + 100,
-                    left:0,
-                    right:0,
-                    // bottom:0,
-                    margin:"0 auto"}} />
-                </>
+                  style={{ top: scrollY.get() + 100 }} 
+                >
+                  {clickedMovie && 
+                    <>
+                      <BigCover 
+                         style={{
+                          backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
+                            clickedMovie.backdrop_path
+                          )})`,
+                        }}
+                      />
+                      <BigTitle>{clickedMovie.title}</BigTitle>
+                      <BigOverview>{clickedMovie.overview}</BigOverview>
+                    </>
+                  }
+                </BigMovieModal>
+              </>
             ) : null}
           </AnimatePresence> 
         </>
