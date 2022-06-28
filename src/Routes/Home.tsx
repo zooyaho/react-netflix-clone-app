@@ -17,13 +17,13 @@ const Loader = styled.div`
   align-items: center;
 `;
 
-const Banner = styled.div<{bgPhoto:string}>`
+const Banner = styled.div<{bgphoto:string}>`
   height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 60px;
-  background-image: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,1)),url(${(props)=> props.bgPhoto});
+  background-image: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,1)),url(${(props)=> props.bgphoto});
   background-size: cover;
 `;
 
@@ -54,8 +54,8 @@ const Row = styled(motion.div)`
   width: 100%;
 `;
 
-const SlideBox = styled(motion.div)<{bgPhoto:string}>`
-  background-image: url(${props=>props.bgPhoto});
+const SlideBox = styled(motion.div)<{bgphoto:string}>`
+  background-image: url(${props=>props.bgphoto});
   background-size: cover;
   background-position: center center; // 상하좌우 center
   // background-color: white;
@@ -87,7 +87,6 @@ const Home = () => {
   const [isLeaving, setIsLeaving] = useState(false); // 원래 있던 Row가 사라지기도 전에 새 Row도 사라지는 걸 방지하는 변수. 두번씩 클릭해도 정상적으로 슬라이드 효과를 냄.
   const navigate = useNavigate();
   const bigMovieMatch = useMatch("/movies/:movieId");
-  console.log(bigMovieMatch);
 
   // isLeaving의 상태를 2번 바꿔 버그를 방지함.
   const toggleLeaving = ()=>{setIsLeaving(prev=> !prev)}
@@ -160,7 +159,7 @@ const Home = () => {
           <Banner 
             onClick={increaseindexHandler}
             // image path에 대한 fallback(〔컴퓨터〕 （고장시의） 대체 시스템) 설정
-            bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}
+            bgphoto={makeImagePath(data?.results[0].backdrop_path || "")}
           >
             <Title>{data?.results[0].title}</Title>
             <Overview>{data?.results[0].overview}</Overview>
@@ -186,13 +185,14 @@ const Home = () => {
                   .slice(offset * sliderIndex, offset * sliderIndex + offset)
                   .map((movie:IMovie) => (
                     <SlideBox 
+                      layoutId={movie.id+""} // string형식이어야함.
                       variants={boxVariants}
                       initial="normal"
                       whileHover="hover"
                       transition={{type: "tween"}} // 둘다 설정해야 blur시에도 spring효과가 사라짐.
                       onClick={()=>{boxClickedHandler(movie.id)}}
                       key={movie.id}
-                      bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
+                      bgphoto={makeImagePath(movie.backdrop_path, "w500")}
                     >
                       {/* <img /> */}
                       <SlideInfo variants={infoVariants} >
@@ -203,6 +203,25 @@ const Home = () => {
               </Row>
             </AnimatePresence>
           </Slider>
+          <AnimatePresence>
+            {bigMovieMatch ? (
+              <>
+                {/* <Overlay /> */}
+                <motion.div 
+                  layoutId={bigMovieMatch.params.movieId + ""}
+                  style={{
+                    position:"absolute", 
+                    width:"40vw", 
+                    height: "80vh", 
+                    backgroundColor:"pink", 
+                    top:50,
+                    left:0,
+                    right:0,
+                    // bottom:0,
+                    margin:"0 auto"}} />
+                </>
+            ) : null}
+          </AnimatePresence> 
         </>
       )}
     </Wrapper>
