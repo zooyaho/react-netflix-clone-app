@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useQuery} from 'react-query';
 import {getMovies, IMovie} from '../api';
 import styled from 'styled-components';
-import {motion, AnimatePresence} from 'framer-motion';
+import {motion, AnimatePresence, useViewportScroll} from 'framer-motion';
 import {makeImagePath} from '../utils';
 import {useNavigate, useMatch} from 'react-router-dom';
 
@@ -79,6 +79,15 @@ const SlideInfo = styled(motion.div)`
   background-color: ${props=> props.theme.black.lighter};
 `;
 
+const Overlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+`;
+
 const offset = 6; // 슬라이드에서 한번에 보여줄 영화의 개수를 6으로 설정
 
 const Home = () => {
@@ -87,6 +96,7 @@ const Home = () => {
   const [isLeaving, setIsLeaving] = useState(false); // 원래 있던 Row가 사라지기도 전에 새 Row도 사라지는 걸 방지하는 변수. 두번씩 클릭해도 정상적으로 슬라이드 효과를 냄.
   const navigate = useNavigate();
   const bigMovieMatch = useMatch("/movies/:movieId");
+  const { scrollY }= useViewportScroll(); // 모달창 위치 설정
 
   // isLeaving의 상태를 2번 바꿔 버그를 방지함.
   const toggleLeaving = ()=>{setIsLeaving(prev=> !prev)}
@@ -114,6 +124,12 @@ const Home = () => {
     navigate(`/movies/${movieId}`);
   }
 
+  const overlayClickedHandler = ()=>{
+    // overlay클릭 시 모듈창 닫힘.
+    navigate(`/`);
+  };
+
+  /* s: Variants */
   const rowVariants = {
     hidden: {
       x: window.outerWidth + 1, // 사용자의 화면 크기를 가져와야 자연스럽게 슬라이드 되며 Row와 Row 사이의 gap을 주기위해 +1을 적용.
@@ -125,7 +141,6 @@ const Home = () => {
       x: -window.outerWidth - 1,
     },
   }
-
   const boxVariants = {
     normal: {
       scale: 1,
@@ -150,6 +165,7 @@ const Home = () => {
       }
     },
   }
+  /* e: Variants */
 
   return (
     <Wrapper>{isLoading ? (
@@ -206,15 +222,15 @@ const Home = () => {
           <AnimatePresence>
             {bigMovieMatch ? (
               <>
-                {/* <Overlay /> */}
+                <Overlay onClick={overlayClickedHandler} animate={{opacity:1}} />
                 <motion.div 
                   layoutId={bigMovieMatch.params.movieId + ""}
                   style={{
                     position:"absolute", 
                     width:"40vw", 
-                    height: "80vh", 
+                    height: "80vh",
                     backgroundColor:"pink", 
-                    top:50,
+                    top: scrollY.get() + 100,
                     left:0,
                     right:0,
                     // bottom:0,
