@@ -6,6 +6,12 @@ import {motion, AnimatePresence, useViewportScroll} from 'framer-motion';
 import {makeImagePath} from '../utils';
 import {useNavigate, useMatch} from 'react-router-dom';
 
+// Icon
+import Icon from '@mdi/react';
+import { mdiPlay } from '@mdi/js';
+import { mdiPlus } from '@mdi/js';
+import { mdiThumbUpOutline } from '@mdi/js';
+
 const Wrapper = styled.div`
   background: black;
 `;
@@ -58,7 +64,6 @@ const SlideBox = styled(motion.div)<{bgphoto:string}>`
   background-image: url(${props=>props.bgphoto});
   background-size: cover;
   background-position: center center; // 상하좌우 center
-  // background-color: white;
   height: 200px;
   color: ${props=> props.theme.white.lighter};
   cursor: pointer;
@@ -90,7 +95,7 @@ const Overlay = styled(motion.div)`
 
 const BigMovieModal = styled(motion.div)`
   position: absolute; 
-  width: 60vw; 
+  width: 40vw; 
   height:  80vh;
   background-Color: pink; 
   left: 0;
@@ -98,7 +103,7 @@ const BigMovieModal = styled(motion.div)`
   margin: 0 auto;
   border-radius: 15px;
   overflow: hidden;
-  background-color: ${(props) => props.theme.black.lighter};
+  background-color: #121212;
 `;
 
 const BigCover = styled.div`
@@ -111,22 +116,75 @@ const BigCover = styled.div`
 const BigTitle = styled.h3`
   color: ${(props) => props.theme.white.lighter};
   padding: 20px;
+  padding-bottom:0px;
   font-size: 46px;
   position: relative;
   top: -80px;
 `;
 
-const BigOverview = styled.p`
+const IntroSection = styled.div`
+  display: flex;
   padding: 20px;
   position: relative;
   top: -80px;
+`;
+
+const FirWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-basis: 70%;
+`;
+
+const BtnWrap = styled.div`
+  display: flex;
+  align-items: center;
+  button {
+    height: 35px;
+    width: 35px;
+    margin-right: 10px;
+    padding: 5px;
+    background-color: transparent;
+    border-radius: 35px;
+    border: 1.5px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  button:nth-child(1) {
+    background-color: white;
+    border-radius: 10px;
+    width: 150px;
+    height: 40px;
+    font-weight: 600;
+    font-size: 18px;
+  }
+`;
+
+const BigOverview = styled.p`
+  margin-top: 20px;
   color: ${(props) => props.theme.white.lighter};
 `;
+
+const IntroWrap = styled.div`
+  flex-basis: 30%;
+  font-size: 14px;
+  padding-left: 10px;
+  strong {
+    font-weight: 400;
+    color: #555;
+    margin-right: 5px;
+  }
+  li {
+    margin-bottom: 5px;
+  }
+`;
+
 
 const offset = 6; // 슬라이드에서 한번에 보여줄 영화의 개수를 6으로 설정
 
 const Home = () => {
   const {data, isLoading} = useQuery(['movies', 'nowPlaying'], getMovies);
+  console.log(data);
   const [sliderIndex, setSliderIndex] = useState(0); // page수, api에서 총 19개의 영화를 가져오므로 page는 3개임.(0,1,2)
   const [isLeaving, setIsLeaving] = useState(false); // 원래 있던 Row가 사라지기도 전에 새 Row도 사라지는 걸 방지하는 변수. 두번씩 클릭해도 정상적으로 슬라이드 효과를 냄.
   const navigate = useNavigate();
@@ -273,7 +331,62 @@ const Home = () => {
                         }}
                       />
                       <BigTitle>{clickedMovie.title}</BigTitle>
-                      <BigOverview>{clickedMovie.overview}</BigOverview>
+                      <IntroSection>
+                        <FirWrap>
+                          <BtnWrap>
+                            <button>
+                              <Icon 
+                                path={mdiPlay}
+                                title="play icon"
+                                size="35px"/>
+                                Play
+                            </button>
+                            <button>
+                              <Icon 
+                                path={mdiPlus}
+                                title="play icon"
+                                size={.7}
+                                color="white"/>
+                            </button>
+                            <button>
+                              <Icon 
+                                path={mdiThumbUpOutline}
+                                title="play icon"
+                                size="15px"
+                                color="white"/>
+                            </button>
+                            <button>
+                              <Icon 
+                                path={mdiThumbUpOutline}
+                                title="play icon"
+                                size={.7}
+                                rotate={180}
+                                color="white"/>
+                            </button>
+                          </BtnWrap>
+                          <BigOverview>{clickedMovie.overview}</BigOverview>
+                        </FirWrap>
+                        <IntroWrap>
+                          <ul>
+                            <li>
+                              <strong>Grading</strong>
+                              <span>7.9</span>
+                            </li>
+                            <li>
+                              <strong>Genres</strong>
+                              <span>Drama, Comedy</span>
+                            </li>
+                            <li>
+                              <strong>release_date</strong>
+                              <span>2022-02-17</span>
+                            </li>
+                            <li>
+                              <strong>runtime</strong>
+                              <span>102</span>
+                            </li>
+                          </ul>
+                        </IntroWrap>
+                      </IntroSection>
                     </>
                   }
                 </BigMovieModal>

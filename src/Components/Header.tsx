@@ -1,7 +1,8 @@
 import {useState, useEffect} from 'react';
 import styled from "styled-components";
 import { motion, useAnimation, useViewportScroll } from 'framer-motion';
-import {Link, useMatch} from "react-router-dom";
+import {Link, useMatch, useNavigate} from "react-router-dom";
+import { useForm } from 'react-hook-form';
 
 const Nav = styled(motion.nav)`
   display: flex;
@@ -47,7 +48,7 @@ const Item = styled.li`
   }
 `;
 
-const Search = styled.span`
+const SearchForm = styled.form`
   color: white;
   display: flex;
   align-items: center;
@@ -89,6 +90,10 @@ const logoVariants = {
   },
 }
 
+interface IForm {
+  keyword: string;
+}
+
 const Header = () => {
   const [toggleSearch, setToggleSearch] = useState(false);
   const homeMatch = useMatch("/"); // path에 따른 메뉴의 폰트굵기 지정
@@ -96,6 +101,13 @@ const Header = () => {
   const inputAnimation = useAnimation(); // animation들을 동시에 실행시킬 때 유용함.
   const navAnimation = useAnimation();
   const {scrollY} = useViewportScroll(); // 스크롤을 움직일 때 제일 밑에서 얼마나 멀리 있는지 알려줌.
+  const { register, handleSubmit } = useForm<IForm>();
+  const navigate = useNavigate();
+
+  const onValid = (data:IForm)=>{
+    // 사용자의 클릭 없이 사용자를 다른 페이지로 이동
+    navigate(`/search?keyword=${data.keyword}`); // keyword= : query arguments
+  };
 
   // 검색 토글 버튼 핸들러
   const toggleSearchHandler = ()=>{
@@ -145,7 +157,7 @@ const Header = () => {
         </Items>
       </Col>
       <Col>
-        <Search>
+        <SearchForm onSubmit={handleSubmit(onValid)}>
           <motion.svg
             onClick={toggleSearchHandler}
             animate={{x: toggleSearch ? "-218px" : "0px"}}
@@ -161,13 +173,14 @@ const Header = () => {
             ></path>
           </motion.svg>
           <SearchInput 
+            {...register("keyword", { required: true , minLength: 2 })}
             initial={{ scaleX: 0 }}
             animate={inputAnimation}
             // animate={{scaleX: toggleSearch ? 1 : 0}}
             transition={{type:"linear"}} // 선형적으로 animation지정
             placeholder="Search for movie or tv show..."
           />
-        </Search>
+        </SearchForm>
       </Col>
     </Nav>
   );
